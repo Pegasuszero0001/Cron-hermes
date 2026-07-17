@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="พื้นที่เล็ก ๆ สำหรับหยุดพักและกลับมามองใจ">
+  <title>ธรรมะประจำวัน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600&family=Sarabun:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Design Tokens ─── */
+    :root {
+      --font-sans: 'Noto Sans Thai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-serif: 'Sarabun', 'Noto Sans Thai', Georgia, serif;
+      --bg: #f9f7f3;
+      --surface: #ffffff;
+      --surface-raised: #fffefb;
+      --text: #2b2622;
+      --text-muted: #6f675e;
+      --accent: #6c7b63;
+      --accent-hover: #58644f;
+      --accent-light: #e9ece6;
+      --border: #e5dfd5;
+      --border-strong: #d4cdc1;
+      --shadow: 0 1px 2px rgba(43, 38, 34, 0.05), 0 6px 16px rgba(43, 38, 34, 0.04);
+      --shadow-sm: 0 1px 2px rgba(43, 38, 34, 0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1c1a17;
+      --surface: #24221f;
+      --surface-raised: #2a2723;
+      --text: #efe9e1;
+      --text-muted: #a49d94;
+      --accent: #9db095;
+      --accent-hover: #b4c4ad;
+      --accent-light: #2f322c;
+      --border: #3d3832;
+      --border-strong: #4f4942;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.18);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
+    }
+
+    /* ─── Motion Preferences ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    button, input, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    img, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ─── Utilities ─── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+    }
+
+    /* ─── Header ─── */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      background-color: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .site-header__inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-4);
+      align-items: center;
+      padding-top: var(--space-5);
+      padding-bottom: var(--space-5);
+    }
+
+    .brand__title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand__tagline {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: var(--space-1);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      background-color: var(--bg);
+    }
+
+    .stat-pill strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background-color: var(--surface-raised);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--accent-light);
+      border-color: var(--border-strong);
+    }
+
+    .theme-toggle:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+    }
+
+    [data-theme="dark"] .theme-toggle .icon-sun,
+    [data-theme="light"] .theme-toggle .icon-moon {
+      display: none;
+    }
+
+    /* ─── Main Layout ─── */
+    .main {
+      padding: var(--space-7) 0 var(--space-8);
+    }
+
+    .section {
+      margin-bottom: var(--space-6);
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    /* ─── Skeleton ─── */
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--border) 0%,
+        var(--surface-raised) 50%,
+        var(--border) 100%
+      );
+      background-size: 200% 100%;
+      border-radius: var(--radius-sm);
+      animation: skeleton-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes skeleton-pulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton--text {
+      height: 1em;
+      margin-bottom: var(--space-3);
+    }
+
+    .skeleton--text-lg {
+      height: 1.6em;
+      width: 85%;
+      margin-bottom: var(--space-4);
+    }
+
+    .skeleton--badge {
+      height: 1.8em;
+      width: 80px;
+      border-radius: 999px;
+    }
+
+    .skeleton-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skeleton-featured {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-6);
+      box-shadow: var(--shadow);
+    }
+
+    .skeleton-featured__actions {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-5);
+    }
+
+    .skeleton--btn {
+      height: 40px;
+      width: 140px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ─── Loading State ─── */
+    .loading-state {
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+      color: var(--text-muted);
+    }
+
+    .loading-state__spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--space-4);
+      color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-state__text {
+      font-size: 1rem;
+    }
+
+    /* ─── Error State ─── */
+    .error-state {
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+      color: var(--text-muted);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      background-color: var(--surface);
+    }
+
+    .error-state__icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--space-4);
+      color: #c4785a;
+    }
+
+    .error-state__title {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .error-state__desc {
+      font-size: 0.95rem;
+      margin-bottom: var(--space-4);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ─── Featured Quote ─── */
+    .featured {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 0 0;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent-light));
+      opacity: 0.6;
+    }
+
+    .featured__content {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .featured__content.is-fading {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .featured__quote {
+      font-family: var(--font-serif);
+      font-size: clamp(1.35rem, 3.5vw, 1.9rem);
+      line-height: 1.45;
+      font-weight: 500;
+      margin-bottom: var(--space-4);
+      padding-left: var(--space-5);
+    }
+
+    .featured__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+      padding-left: var(--space-5);
+      margin-bottom: var(--space-5);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-1) var(--space-3);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background-color: var(--accent-light);
+      color: var(--accent-hover);
+    }
+
+    .featured__source {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .featured__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      padding-left: var(--space-5);
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn--primary {
+      background-color: var(--accent);
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn--primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn--secondary {
+      background-color: var(--surface-raised);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn--secondary:hover {
+      background-color: var(--accent-light);
+      border-color: var(--border-strong);
+    }
+
+    .btn--ghost {
+      color: var(--text-muted);
+      padding: var(--space-2);
+    }
+
+    .btn--ghost:hover {
+      color: var(--text);
+      background-color: var(--accent-light);
+    }
+
+    .btn--icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Controls ─── */
+    .controls {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-4);
+    }
+
+    .controls__grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-3);
+      align-items: end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .control-group--search { grid-column: span 12; }
+    .control-group--category { grid-column: span 6; }
+    .control-group--sort { grid-column: span 6; }
+
+    @media (min-width: 640px) {
+      .control-group--search { grid-column: span 6; }
+      .control-group--category { grid-column: span 3; }
+      .control-group--sort { grid-column: span 3; }
+    }
+
+    .control-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .control-input,
+    .control-select {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background-color: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .control-input:focus,
+    .control-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .controls__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .result-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Tabs ─── */
+    .tabs {
+      display: flex;
+      gap: var(--space-1);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-5);
+    }
+
+    .tab {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .tab:focus-visible {
+      outline: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      box-shadow: 0 0 0 2px var(--accent-light);
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ─── Quote Grid ─── */
+    .quote-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 640px) {
+      .quote-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-5);
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      position: relative;
+    }
+
+    .quote-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .quote-card:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light), var(--shadow);
+      border-color: var(--accent);
+    }
+
+    .quote-card__quote {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: var(--space-4);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .quote-card__footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .quote-card__meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      min-width: 0;
+    }
+
+    .quote-card__source {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .quote-card__date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+
+    .quote-card__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--text-muted);
+      transition: color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .icon-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .icon-btn:hover {
+      background-color: var(--accent-light);
+      color: var(--text);
+    }
+
+    .icon-btn.is-active {
+      color: #d15a5a;
+    }
+
+    .icon-btn.is-active:hover {
+      color: #b84545;
+    }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ─── Empty State ─── */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+      color: var(--text-muted);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background-color: var(--surface);
+    }
+
+    .empty-state__icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--space-4);
+      color: var(--border-strong);
+    }
+
+    .empty-state__title {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .empty-state__desc {
+      font-size: 0.95rem;
+      margin-bottom: var(--space-4);
+    }
+
+    /* ─── Modal ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(20, 18, 16, 0.55);
+      backdrop-filter: blur(3px);
+      display: grid;
+      place-items: center;
+      padding: var(--space-4);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 640px;
+      max-height: calc(100vh - var(--space-8));
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.96);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.is-open .modal {
+      transform: scale(1);
+    }
+
+    .modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal__title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .modal__close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .modal__close:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .modal__close:hover {
+      background-color: var(--accent-light);
+      color: var(--text);
+    }
+
+    .modal__body {
+      padding: var(--space-6) var(--space-5);
+      overflow-y: auto;
+    }
+
+    .modal__quote {
+      font-family: var(--font-serif);
+      font-size: clamp(1.25rem, 3vw, 1.6rem);
+      line-height: 1.5;
+      font-weight: 500;
+      margin-bottom: var(--space-5);
+      color: var(--text);
+    }
+
+    .modal__explanation {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: var(--space-5);
+      padding-left: var(--space-4);
+      border-left: 3px solid var(--border);
+    }
+
+    .modal__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+      margin-bottom: var(--space-5);
+    }
+
+    .modal__date {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .modal__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── Scroll to Top ─── */
+    .scroll-top {
+      position: fixed;
+      bottom: var(--space-5);
+      right: var(--space-5);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      color: #fff;
+      border: none;
+      box-shadow: var(--shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 90;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease, background-color 0.2s ease;
+    }
+
+    .scroll-top.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .scroll-top:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .scroll-top:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light), var(--shadow);
+    }
+
+    .scroll-top svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: var(--space-5);
+      right: var(--space-5);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background-color: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .toast.is-visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast__icon {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ─── Responsive header ─── */
+    @media (max-width: 640px) {
+      .site-header__inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      .header-meta {
+        justify-content: flex-start;
+      }
+
+      .featured {
+        padding: var(--space-5) var(--space-4);
+      }
+
+      .featured__quote,
+      .featured__meta,
+      .featured__actions {
+        padding-left: var(--space-4);
+      }
+
+      .main {
+        padding: var(--space-5) 0 var(--space-7);
+      }
+
+      .scroll-top,
+      .toast {
+        right: var(--space-4);
+        bottom: var(--space-4);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <div class="brand">
+        <h1 class="brand__title">ธรรมะประจำวัน</h1>
+        <p class="brand__tagline">พื้นที่เล็ก ๆ สำหรับหยุดพักและกลับมามองใจ</p>
+      </div>
+      <div class="header-meta">
+        <span class="stat-pill">
+          <span>คำคมทั้งหมด</span>
+          <strong id="total-count">0</strong>
+        </span>
+        <span class="stat-pill">
+          <span>อัปเดตล่าสุด</span>
+          <strong id="last-updated">-</strong>
+        </span>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="สลับโหมดสี"
+          title="สลับโหมดสี"
+        >
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main container">
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state">
+      <svg class="loading-state__spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+      </svg>
+      <p class="loading-state__text">กำลังโหลดข้อธรรม...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-state" hidden>
+      <svg class="error-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p class="error-state__title">ไม่สามารถโหลดข้อมูลได้</p>
+      <p class="error-state__desc" id="error-message">กรุณาตรวจสอบว่า Endpoint ทำงานถูกต้อง หรือลองโหลดใหม่อีกครั้ง</p>
+      <button id="retry-btn" class="btn btn--primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6M1 20v-6h6"></path>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        ลองใหม่
+      </button>
+    </div>
+
+    <!-- App Content -->
+    <div id="app-content" hidden>
+      <!-- Skeleton Featured -->
+      <div id="skeleton-featured" class="skeleton-featured" hidden>
+        <div class="skeleton skeleton--text-lg"></div>
+        <div class="skeleton skeleton--badge"></div>
+        <div class="skeleton-featured__actions">
+          <div class="skeleton skeleton--btn"></div>
+          <div class="skeleton skeleton--btn"></div>
+        </div>
+      </div>
+
+      <!-- Featured Quote -->
+      <section class="section" aria-labelledby="featured-heading">
+        <h2 id="featured-heading" class="section-title">คำคมประจำวัน</h2>
+        <article class="featured" id="featured-card">
+          <div class="featured__content" id="featured-content">
+            <blockquote class="featured__quote" id="featured-quote">กำลังโหลด...</blockquote>
+            <div class="featured__meta">
+              <span class="badge" id="featured-category">-</span>
+              <span class="featured__source" id="featured-source">-</span>
+            </div>
+            <div class="featured__actions">
+              <button id="random-quote-btn" class="btn btn--secondary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>
+                </svg>
+                สุ่มข้อธรรม
+              </button>
+              <button id="featured-read-btn" class="btn btn--primary" type="button">
+                อ่านรายละเอียด
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Controls -->
+      <section class="section" aria-label="ค้นหาและตัวกรอง">
+        <div class="controls">
+          <div class="controls__grid">
+            <div class="control-group control-group--search">
+              <label class="control-label" for="search-input">ค้นหา</label>
+              <input
+                id="search-input"
+                class="control-input"
+                type="search"
+                placeholder="ค้นหาจากคำคม คำอธิบาย หรือที่มา..."
+                autocomplete="off"
+              />
+            </div>
+            <div class="control-group control-group--category">
+              <label class="control-label" for="category-select">หมวดหมู่</label>
+              <select id="category-select" class="control-select">
+                <option value="">ทั้งหมด</option>
+              </select>
+            </div>
+            <div class="control-group control-group--sort">
+              <label class="control-label" for="sort-select">เรียงลำดับ</label>
+              <select id="sort-select" class="control-select">
+                <option value="newest">ใหม่ที่สุด</option>
+                <option value="oldest">เก่าที่สุด</option>
+                <option value="alphabetical">ตัวอักษร ก–ฮ</option>
+              </select>
+            </div>
+          </div>
+          <div class="controls__footer">
+            <span class="result-count" id="result-count">พบ 0 รายการ</span>
+            <button id="clear-filters-btn" class="btn btn--ghost" type="button">
+              ล้างตัวกรอง
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabs -->
+      <div class="tabs" role="tablist" aria-label="เลือกมุมมอง">
+        <button id="tab-all" class="tab is-active" role="tab" aria-selected="true" type="button">คำคมทั้งหมด</button>
+        <button id="tab-favorites" class="tab" role="tab" aria-selected="false" type="button">
+          รายการโปรด
+          <span id="fav-count" class="sr-only">0 รายการ</span>
+        </button>
+      </div>
+
+      <!-- Quote Grid -->
+      <section class="section" aria-label="รายการคำคม">
+        <!-- Skeleton Grid -->
+        <div id="skeleton-grid" class="quote-grid" hidden>
+          <div class="skeleton-card">
+            <div class="skeleton skeleton--text-lg"></div>
+            <div class="skeleton skeleton--text"></div>
+            <div class="skeleton skeleton--badge"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton skeleton--text-lg"></div>
+            <div class="skeleton skeleton--text"></div>
+            <div class="skeleton skeleton--badge"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton skeleton--text-lg"></div>
+            <div class="skeleton skeleton--text"></div>
+            <div class="skeleton skeleton--badge"></div>
+          </div>
+        </div>
+
+        <div id="quote-grid" class="quote-grid"></div>
+        <div id="empty-state" class="empty-state" hidden>
+          <svg class="empty-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path>
+            <path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"></path>
+          </svg>
+          <p class="empty-state__title" id="empty-title">ยังไม่มีข้อธรรมในขณะนี้</p>
+          <p class="empty-state__desc" id="empty-desc">ข้อมูลจะปรากฏเมื่อ Cron Job ส่งคำคมธรรมะเข้ามา</p>
+          <button id="empty-clear-btn" class="btn btn--secondary" type="button" hidden>ล้างตัวกรอง</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Scroll to Top -->
+  <button id="scroll-top" class="scroll-top" type="button" aria-label="เลื่อนกลับขึ้นด้านบน" title="เลื่อนกลับขึ้นด้านบน">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7"></path>
+    </svg>
+  </button>
+
+  <!-- Modal -->
+  <div
+    id="modal-overlay"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-quote"
+    hidden
+  >
+    <div class="modal" role="document">
+      <div class="modal__header">
+        <span id="modal-title" class="modal__title">รายละเอียดคำคม</span>
+        <button id="modal-close" class="modal__close" type="button" aria-label="ปิด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <blockquote id="modal-quote" class="modal__quote"></blockquote>
+        <p id="modal-explanation" class="modal__explanation"></p>
+        <div class="modal__meta">
+          <span id="modal-category" class="badge">-</span>
+          <span id="modal-source" class="quote-card__source">-</span>
+          <time id="modal-date" class="modal__date">-</time>
+        </div>
+        <div class="modal__actions">
+          <button id="modal-copy-btn" class="btn btn--secondary" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            คัดลอก
+          </button>
+          <button id="modal-fav-btn" class="btn btn--secondary" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span id="modal-fav-text">บันทึกรายการโปรด</span>
+          </button>
+          <button id="modal-share-btn" class="btn btn--secondary" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path>
+            </svg>
+            แชร์
+          </button>
+          <button id="modal-close-btn" class="btn btn--primary" type="button">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+    <svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toast-message">สำเร็จ</span>
+  </div>
+
+  <script>
+    // ═════ Configuration ═════
+    const CRONJOB_API_ENDPOINT = 'quotes.json';
+    const STORAGE_KEYS = {
+      favorites: 'dhamma-quotes-favorites',
+      theme: 'dhamma-quotes-theme'
+    };
+
+    // ═════ Sample Data ═════
+    const cronjobResponses =     [
+          {
+                "id": "quote-001",
+                "quote": "อิทธิบาท ๔ — ฉันทะ วิริยะ จิตตะ วิมังสา ผู้ใดเจริญทำให้มากแล้ว ผู้นั้นย่อมถึงความเจริญ ไม่เสื่อมถอยในกุศลธรรมทั้งหลาย",
+                "explanation": "อิทธิบาท ๔ คือ ๔ เสาหลักของความสำเร็จ: ฉันทะ (รักในสิ่งที่ทำ), วิริยะ (ขยัน ไม่ยอมแพ้), จิตตะ (จดจ่ออยู่กับปัจจุบัน), วิมังสา (รู้จักทบทวน ปรับปรุง) ความสำเร็จไม่ใช่เรื่องของพรสวรรค์ แต่เป็นเรื่องของการมีเครื่องมือที่ถูกต้องและใช้มันทุกวัน",
+                "source": "สังยุตตนิกาย อิทธิบาทสังยุตต์",
+                "category": "อิทธิบาท",
+                "createdAt": "2026-06-30T15:47:00+07:00"
+          },
+          {
+                "id": "quote-002",
+                "quote": "ธรรมทั้งหลายมีใจเป็นหัวหน้า มีใจเป็นใหญ่ สำเร็จด้วยใจ",
+                "explanation": "ก่อนจะเปลี่ยนนิสัย เปลี่ยนวินัย หรือเปลี่ยนผลลัพธ์ สิ่งแรกที่ต้องเปลี่ยนคือวิธีคิด ถ้าใจเห็นค่า การกระทำจะตามมาเองโดยไม่ต้องฝืน จิตเป็นนาย กายเป็นบ่าว",
+                "source": "ขุททกนิกาย ธรรมบท ข้อ ๑",
+                "category": "จิต",
+                "createdAt": "2026-07-01T19:17:00+07:00"
+          },
+          {
+                "id": "quote-003",
+                "quote": "ฉันทะ วิริยะ จิตตะ วิมังสา ธรรม ๔ ประการนี้ อันบุคคลเจริญแล้ว ย่อมเป็นไปเพื่อความสำเร็จแห่งกิจทั้งปวง",
+                "explanation": "ฉันทะ = รักในสิ่งที่ทำ, วิริยะ = ขยัน ไม่ยอมแพ้, จิตตะ = จดจ่ออยู่กับมัน, วิมังสา = รู้จักทบทวน ปรับปรุง ทางแห่งความสำเร็จไม่ได้เริ่มที่โชค แต่มันเริ่มที่ฉันทะก้าวแรกต่างหาก",
+                "source": "อิทธิบาท ๔ พระไตรปิฎก",
+                "category": "อิทธิบาท",
+                "createdAt": "2026-07-01T23:18:00+07:00"
+          },
+          {
+                "id": "quote-004",
+                "quote": "สายพิณที่ขึงตึงเกินไปก็ขาด สายที่หย่อนเกินไปก็ไม่ดัง เสมอดีนั่นแหละจึงจะเกิดเสียงไพเราะ การปรารภความเพียรเกินไปก็ให้ใจฟุ้งซ่าน การปรารภความเพียรน้อยเกินไปก็ให้เกิดความเกียจคร้าน",
+                "explanation": "พระพุทธเจ้าตรัสสอนพระโสณะด้วยอุปมาสายพิณ ความสมดุลคือหัวใจของการพัฒนาตนเอง ไม่เร่งเกินไปจนหมดแรง และไม่ปล่อยวางเกินไปจนเกียจคร้าน",
+                "source": "โสณสูตร องฺ. ๖.๕๕",
+                "category": "สมาธิ",
+                "createdAt": "2026-07-03T04:13:00+07:00"
+          },
+          {
+                "id": "quote-005",
+                "quote": "อตฺตทีโป วิหรถ อตฺตสรณา อนญฺญสรณา จงมีตนเป็นดวงประทีป มีตนเป็นที่พึ่ง ไม่พึ่งผู้อื่น",
+                "explanation": "พระพุทธเจ้าตรัสก่อนปรินิพพาน การพัฒนาตัวเองที่แท้จริงไม่ใช่การตามสูตรของใคร แต่คือการเจริญสติ รู้จักจุดแข็งจุดอ่อนของตัวเอง แล้วค่อยๆ ปรับปรุงจากภายใน",
+                "source": "มหาปรินิพพานสูตร ที.ม. ๑๐/๑๔๒",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-03T15:34:00+07:00"
+          },
+          {
+                "id": "quote-006",
+                "quote": "มโนปุพฺพงฺคมา ธมฺมา มโนเสฏฺฐา มโนมยา ธรรมทั้งหลายมีใจเป็นหัวหน้า มีใจเป็นใหญ่ สำเร็จได้ด้วยใจ",
+                "explanation": "ก่อนจะเปลี่ยนนิสัยหรือวินัย สิ่งแรกที่ต้องเปลี่ยนคือวิธีคิด การพัฒนาตัวเองที่ยั่งยืนไม่ได้เริ่มที่การเปลี่ยน schedule หรือซื้อคอร์สใหม่ แต่เริ่มที่การฝึกจิตของเราให้เป็นมิตรกับความเปลี่ยนแปลง",
+                "source": "ขุททกนิกาย ธรรมบท",
+                "category": "จิต",
+                "createdAt": "2026-07-04T16:48:00+07:00"
+          },
+          {
+                "id": "quote-007",
+                "quote": "ความเพียรที่เกิดในวันนี้ ยังประเสริฐกว่าความเกียจคร้านที่เกิดเมื่อวาน",
+                "explanation": "ความเพียร (วิริยะ) เป็นหนึ่งในอิทธิบาท ๔ ไม่ได้หมายถึงการหักดิบข้ามคืน แต่หมายถึงการก้าวไปข้างหน้าอย่างสม่ำเสมอ แม้เพียงเล็กน้อย วันนี้เลือกทำอะไรสักอย่างให้ดีขึ้นได้ แค่ 1% ก็พอ",
+                "source": "พุทธวจนะ ขุ.สุ. ๒๕/๓๑๗",
+                "category": "วิริยะ",
+                "createdAt": "2026-07-05T13:14:00+07:00"
+          },
+          {
+                "id": "quote-008",
+                "quote": "วยธมฺมา สงฺขารา อปฺปมาเทน สมฺปาเทถ สังขารทั้งหลายมีความเสื่อมไปเป็นธรรมดา ท่านทั้งหลายจงยังความไม่ประมาทให้ถึงพร้อมเถิด",
+                "explanation": "อัปปมาทะ (ความไม่ประมาท) สอนว่าชีวิตไม่รอใคร การผลัดวันประกันพรุ่งคือการปล่อยให้เวลาไหลผ่านมือไปโดยไม่เกิดดอกผล เปลี่ยนพฤติกรรมง่ายๆ: ทำทันที โฟกัสทีละงาน จดบันทึกก่อนนอน",
+                "source": "มหาปรินิพพานสูตร",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-06T11:23:00+07:00"
+          },
+          {
+                "id": "quote-009",
+                "quote": "ธรรมทั้งหลาย มีใจเป็นหัวหน้า มีใจเป็นใหญ่ สำเร็จด้วยใจ",
+                "explanation": "ทุกสิ่งที่เกิดขึ้นในชีวิต ใจเป็นตัวกำหนดทั้งหมด ถ้าใจคิดว่าทำได้ โอกาสก็เปิด ถ้าใจคิดว่าสู้ไหว กำลังใจก็มา ก่อนเริ่มอะไร ให้หายใจเข้าลึก นึกถึงเป้าหมาย แล้วเริ่มเลยโดยไม่รอให้พร้อม",
+                "source": "ขุ.ธ. ๒๕/๑/๑",
+                "category": "จิต",
+                "createdAt": "2026-07-06T15:24:00+07:00"
+          },
+          {
+                "id": "quote-010",
+                "quote": "ความเพียรชอบ ๔ ประการ: เพียรระวังมิให้อกุศลเกิด เพียรละอกุศลที่เกิดขึ้น เพียรทำกุศลที่ยังไม่เกิดให้เกิด เพียรรักษากุศลที่เกิดขึ้นให้มั่นคง",
+                "explanation": "สัมมัปปธาน ๔ คือโครงสร้างการเปลี่ยนนิสัย: ข้อ ๑-๒ ใช้ลดพฤติกรรมไม่ดี ข้อ ๓-๔ ใช้สร้างนิสัยใหม่ที่ดี เคล็ดลับคือทีละข้อ อะไรพรุ่งนี้ทีเดียว เลือกข้อที่ถนัดที่สุดก่อน",
+                "source": "สัมมัปปธาน ๔ พระสุตตันตปิฎก",
+                "category": "วิริยะ",
+                "createdAt": "2026-07-07T06:46:00+07:00"
+          },
+          {
+                "id": "quote-011",
+                "quote": "มโนปุพฺพงฺคมา ธมฺมา — ธรรมทั้งหลายมีใจเป็นหัวหน้า ทุกอย่างที่เกิดขึ้นในวันนี้ถูกกรองด้วยใจของเราทั้งสิ้น",
+                "explanation": "ถ้าใจสบาย เรื่องร้ายกลายเป็นแค่ความท้าทาย ถ้าใจขุ่นมัว เรื่องเล็กกลายเป็นภูเขา วันนี้ลองหายใจลึกๆ สักนาทีก่อนตอบสนองอะไร แค่เท่านี้วันทำงานก็เบาลงเยอะแล้ว",
+                "source": "พระพุทธเจ้า ธรรมบท คาถาที่ ๑",
+                "category": "จิต",
+                "createdAt": "2026-07-07T17:22:00+07:00"
+          },
+          {
+                "id": "quote-012",
+                "quote": "อตฺตา หิ อตฺตโน นาโถ โก หิ นาโถ ปโร สิยา ตนแลเป็นที่พึ่งแห่งตน เพราะใครเล่าจักเป็นที่พึ่งอื่นได้",
+                "explanation": "self-development ที่แท้จริงไม่ใช่การหาคำตอบจากคนอื่น แต่คือการเป็นเจ้าของปัญหาของตัวเองให้ได้ก่อน ความเปลี่ยนแปลงที่ยั่งยืนเกิดจากจิตที่พร้อมรับผิดชอบชีวิตของตน ไม่รอ ไม่โทษ ไม่ผลักภาระ",
+                "source": "ขุ.ธ. ๒๕/๒๔",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-07T21:23:00+07:00"
+          },
+          {
+                "id": "quote-013",
+                "quote": "อปฺปมาโท อมตํ ปทํ ปมาโท มจฺจุโน ปทํ ความไม่ประมาทเป็นทางแห่งความไม่ตาย ความประมาทเป็นทางแห่งความตาย",
+                "explanation": "สิ่งที่แยกคนที่ถึงฝันกับคนที่หยุดกลางคัน ไม่ใช่พรสวรรค์ ไม่ใช่ทรัพยากร แต่คือวันที่เลือกจะลงมือทำทั้งที่ไม่อยากทำ ความไม่ประมาทคือสติที่ตื่นอยู่เสมอ ไม่ปล่อยให้เดี๋ยวค่อยทำกลบเสียงหัวใจ",
+                "source": "ขุททกนิกาย ธรรมบท ข้อ ๒๑",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-08T07:56:00+07:00"
+          },
+          {
+                "id": "quote-014",
+                "quote": "สังขารทั้งหลายมีความเสื่อมเป็นธรรมดา ท่านทั้งหลายจงยังกิจให้ถึงพร้อมด้วยความไม่ประมาทเถิด",
+                "explanation": "อัปปมาทะไม่ใช่การเดินตัวแข็งกลัวผิด แต่คือการมีสติรู้ตัวอยู่กับปัจจุบันขณะ ฝึกง่ายๆ: กินข้าวโดยไม่ดูจอ ทำงานทีละอย่าง ก่อนนอนถามตัวเองว่าวันนี้เราอยู่กับมันหรือแค่ผ่านไป",
+                "source": "มหาปรินิพพานสูตร ที.ม. ๑๐/๙๕/๖๕",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-08T11:57:00+07:00"
+          },
+          {
+                "id": "quote-015",
+                "quote": "อตฺตา หิ อตฺตโน นาโถ — ตนแลเป็นที่พึ่งแห่งตน บุคคลอื่นใครเล่าจะเป็นที่พึ่งได้",
+                "explanation": "จุดเปลี่ยนที่แท้จริงไม่ได้อยู่ที่คนอื่น แต่อยู่ที่การตัดสินใจของตัวคุณเองในวันนี้ ไม่มีใครทำให้เราเก่งขึ้นแทนเราได้ เริ่มจากสิ่งเล็กๆ ที่ทำได้วันนี้ ก้าวเดียวก็ยังดีกว่ายืนนิ่งอยู่กับที่",
+                "source": "ธัมมปทวรรคที่ ๒๕ ขุททกนิกาย",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-09T18:55:00+07:00"
+          },
+          {
+                "id": "quote-016",
+                "quote": "มนสา เจ ปสนฺเนน ภาสติ วา กโรติ วา ตโต นํ สุขมนฺเวติ ฉายาว อนปายินี ถ้าคนมีจิตผ่องใสแล้วพูดหรือทำ ความสุขก็ตามมาสนอง เหมือนเงาติดตามตัว ไม่มีวันหาย",
+                "explanation": "จิตที่ผ่องใสดุจน้ำใส เมื่อไรที่ใจสงบและตั้งมั่น สิ่งที่คิด พูด และทำก็จะออกมาดีโดยอัตโนมัติ ก่อนไปไล่ล่า productivity ลองปรับสภาพภายในก่อน: หายใจเข้าลึก ๆ ๓ รอบ แล้วตั้งเจตนาของวันให้ชัด",
+                "source": "ขุ.ธ. ๒๕/๑/๒",
+                "category": "จิต",
+                "createdAt": "2026-07-09T22:57:00+07:00"
+          },
+          {
+                "id": "quote-017",
+                "quote": "ดูกรภิกษุทั้งหลาย เรากล่าวความสิ้นไปแห่งอาสวะทั้งหลาย ย่อมมีได้เพราะความรู้เห็น ไม่ใช่เพราะไม่รู้ไม่เห็น แต่การรู้เห็นนั้นก็ต้องเป็นไปโดยลำดับ ไม่ใช่ว่ารู้เห็นแล้วจะบรรลุถึงที่สุดได้ในทันที",
+                "explanation": "การปีนบันไดทีละขั้น ไม่มีใครกระโดดจากพื้นขึ้นไปถึงชั้นบนสุดได้ในครั้งเดียว ถ้าท้อวันนี้ แปลว่ากำลังเดินถูกทางแล้ว แค่ก้าวต่อไป ไม่ต้องรีบ แต่ขอให้ไม่หยุด",
+                "source": "องฺ.ติก. ๒๐/๔๔๑/๑๔๑",
+                "category": "ปัญญา",
+                "createdAt": "2026-07-10T02:58:00+07:00"
+          },
+          {
+                "id": "quote-018",
+                "quote": "กมฺมสฺสกา สตฺตา — สัตว์โลกเป็นเจ้าของแห่งกรรม แต่ละคนเป็นไปตามกรรมที่ตนทำ สะสม และสั่งสม",
+                "explanation": "วันนี้ยังไม่ถึงเป้าหมาย ไม่ได้หมายความว่าไม่มีวันถึง วันนี้พลาดไป ไม่ได้หมายความว่าพรุ่งนี้จะชนะไม่ได้ แค่เริ่มสะสมใหม่วันนี้ เดินต่อไป แล้วสักวันผลลัพธ์จะตอบแทนความพยายาม",
+                "source": "กัมมัสสกตาสูตร พระไตรปิฎก",
+                "category": "กรรม",
+                "createdAt": "2026-07-10T14:14:00+07:00"
+          },
+          {
+                "id": "quote-019",
+                "quote": "โยคา เว ชายเต ภูริ — ปัญญาย่อมเกิดจากการประกอบความเพียร",
+                "explanation": "การพัฒนาตัวเองไม่ใช่เรื่องของการรอแรงบันดาลใจ แต่คือการลงมือทำอย่างสม่ำเสมอ การฝึกตนก็เหมือนการเดินทางไกล ก้าวเล็กๆ ทุกก้าวเมื่อรวมกันแล้วพาไปไกลกว่าที่คิด",
+                "source": "พุทธวจนะ ขุททกนิกาย ธรรมบท",
+                "category": "วิริยะ",
+                "createdAt": "2026-07-11T05:13:00+07:00"
+          },
+          {
+                "id": "quote-020",
+                "quote": "ภาชนะที่เต็มไปด้วยน้ำ ย่อมเต็มได้ด้วยหยาดน้ำที่ตกลงทีละหยาดฉันใด ผู้มีปัญญา ย่อมสั่งสมกุศลทีละน้อย จนเต็มเปี่ยมฉันนั้น",
+                "explanation": "ความสำเร็จไม่ได้เกิดจากการกระทำครั้งยิ่งใหญ่เพียงครั้งเดียว แต่เกิดจากการสะสมเล็กๆ ทุกวัน หนังสือวันละ 10 หน้า = ปีละ 12+ เล่ม ออกกำลังกายวันละ 15 นาที = ปีละ 91+ ชั่วโมง ไม่ต้องเก่งในวันแรก แต่ขอแค่ไม่หยุดในวันที่ยาก",
+                "source": "ขุททกนิกาย ธรรมบท ขุ.ธ. ๒๕/๑๒๒",
+                "category": "ปัญญา",
+                "createdAt": "2026-07-11T14:43:00+07:00"
+          },
+          {
+                "id": "quote-021",
+                "quote": "อตฺตานํ ทเมน ปณฺฑิตา ผู้มีปัญญา ย่อมฝึกฝนตนเอง",
+                "explanation": "คำว่าฝึกฝนไม่ใช่การเคี่ยวเข็ญหรือบังคับตัวเอง แต่หมายถึงการค่อยๆ ปรับ น้อมนำ สังเกตใจของตนเอง เหมือนช่างฝึกฝีมือ ยิ่งทำยิ่งคล่อง ยิ่งรู้จริตของตน คนที่เก่งที่สุดไม่ใช่คนที่ออกแรงหนักที่สุดในวันเดียว แต่คือคนที่ลงมือทำ consistently แม้ในวันที่ฝนตกหรือไร้แรงใจ",
+                "source": "ขุ.ธ. ๙/๘๐",
+                "category": "ปัญญา",
+                "createdAt": "2026-07-12T17:36:00+07:00"
+          },
+          {
+                "id": "quote-022",
+                "quote": "จิตนี้ผ่องใส แต่ถูกอุปกิเลสที่จรมาเศร้าหมอง",
+                "explanation": "หัวใจของการพัฒนาตัวเองคือการละ ไม่ใช่การเพิ่ม ก่อนจะหาอะไรมาเติมเต็มชีวิต ลองหันมาขัดเกลาสิ่งที่บดบังความดีงามดั้งเดิมของเราออกก่อน ศักยภาพที่แท้จริงไม่ได้อยู่ที่การเป็นคนใหม่ แต่อยู่ที่การกลับมาเป็นตัวเองที่ชัดเจนที่สุด",
+                "source": "องฺ.เอกก. ข้อ ๔๙-๕๒",
+                "category": "จิต",
+                "createdAt": "2026-07-12T21:37:00+07:00"
+          },
+          {
+                "id": "quote-023",
+                "quote": "เจตนาหํ ภิกฺขเว กมฺมํ วทามิ เจตยิตฺวา กโรติ กายํ วาจํ มโน ดูก่อนภิกษุทั้งหลาย เรากล่าวเจตนาว่าเป็นกรรม เพราะเมื่อมีเจตนาแล้วจึงทำกรรมทางกาย วาจา ใจ",
+                "explanation": "ถ้ามีเจตนาดี การกระทำและผลลัพธ์ก็จะตามมาเอง เหมือนการเริ่มสัปดาห์ด้วย mindset ที่ชัดเจน ลองใช้เวลา ๕ นาทีตอนเช้าเขียน intention statement สำหรับสัปดาห์ ๓ ข้อ ไม่ต้องใหญ่ แค่ชัดเจน",
+                "source": "อังคุตตรนิกาย พระไตรปิฎก",
+                "category": "กรรม",
+                "createdAt": "2026-07-13T10:08:00+07:00"
+          },
+          {
+                "id": "quote-024",
+                "quote": "โยคา เว ชายเต ภูริ — อโยคา ภูริ สงฺขโย ความเพียรย่อมเกิดปัญญา ความไม่มีเพียรย่อมสิ้นปัญญา",
+                "explanation": "ปัญญาไม่ได้เกิดจากการรอให้พร้อม แต่มันเกิดจากการเพียรลงมือทำต่างหาก สม่ำเสมอวันละนิด ไม่ต้องเร่ง ไม่ต้องกดดัน แค่ไม่หยุดเดิน แค่นั้นก็เกินพอแล้ว",
+                "source": "ขุททกนิกาย ธรรมบท ขุ.ธ. ๒๕/๒๘/๔๘",
+                "category": "วิริยะ",
+                "createdAt": "2026-07-13T14:11:00+07:00"
+          },
+          {
+                "id": "quote-025",
+                "quote": "เธอจงพิจารณากายกรรม วจีกรรม มโนกรรม ก่อนทำ กำลังทำ และเมื่อทำแล้ว ว่ามีโทษหรือไม่",
+                "explanation": "self-development ที่ยั่งยืนที่สุดคือการปลูกสติในทุกการกระทำ ไม่ใช่แค่ในเวลานั่งสมาธิ แต่ในเวลาทำงาน คุยงาน หรือแม้แต่ตอนพักผ่อน เผื่อเวลาสัก ๓ วินาทีเพื่อสำรวจใจก่อนทำ ทำให้เราไม่พลาดอะไรสำคัญ และไม่เสียใจทีหลัง",
+                "source": "ราหุโลวาทสูตร พระไตรปิฎก",
+                "category": "สติ",
+                "createdAt": "2026-07-13T18:12:00+07:00"
+          },
+          {
+                "id": "quote-026",
+                "quote": "วยธมฺมา สงฺขารา อปฺปมาเทน สมฺปาเทถ สังขารทั้งหลายมีความเสื่อมเป็นธรรมดา ท่านทั้งหลายจงถึงพร้อมด้วยความไม่ประมาทเถิด",
+                "explanation": "คำสอนสุดท้ายก่อนปรินิพพาน พระพุทธเจ้าทรงเลือกความไม่ประมาท (Appamāda) เป็นโอวาทปัจฉิม การเติบโตที่แท้จริงเกิดจากความไม่ประมาทสะสมวันแล้ววันเล่า ไม่ใช่การเร่งเครื่องครั้งใหญ่แล้วดับ วันนี้มีสิ่งเล็กๆ อะไรที่เราเผลอทำแบบขอไปที? ลองตั้งสติกับมันให้เต็มที่",
+                "source": "มหาปรินิพพานสูตร พระไตรปิฎก",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-14T15:52:00+07:00"
+          },
+          {
+                "id": "quote-027",
+                "quote": "นตฺถิ โลเก รโห นาม ปกสฺสํ กมฺมํ อตฺถิ วา ในโลกนี้ไม่มีอะไรซ่อนเร้นได้จริง และไม่มีกรรมใดที่ปกปิดอยู่ตลอดไป",
+                "explanation": "พระพุทธเจ้าตรัสถึงหิริ (ความละอายต่อการทำชั่ว) และโอตตัปปะ (ความเกรงกลัวต่อผลของกรรม) ว่าเป็นธรรมคุ้มครองโลก เมื่อใช้ชีวิตโดยไม่ต้องปิดบังอะไร จะไม่ต้องแบกน้ำหนักของการจำโกหก ปล่อยพลังนั้นไปสู่สิ่งที่สำคัญจริงๆ แทน",
+                "source": "ที.ม. ๑๐/๙๐ พระไตรปิฎก",
+                "category": "หิริโอตตัปปะ",
+                "createdAt": "2026-07-15T18:40:00+07:00"
+          },
+          {
+                "id": "quote-028",
+                "quote": "บัณฑิตย่อมฝึกฝนตน",
+                "explanation": "การพัฒนาตนเองไม่ใช่เรื่องของแรงบันดาลใจชั่วครั้งชั่วคราว แต่คือการฝึกฝนวันแล้ววันเล่า คล้ายกับหลักทมะ (การฝึกตน) ที่พระพุทธเจ้าทรงแสดงว่าเป็นเหตุให้คนเราสูงขึ้นได้ ไม่ใช่เพราะชาติกำเนิด วันนี้ขอให้สนุกกับการฝึกฝนตัวเองแม้เพียงก้าวเล็กๆ",
+                "source": "ขุททกนิกาย ธัมมปท",
+                "category": "ปัญญา",
+                "createdAt": "2026-07-15T22:41:00+07:00"
+          },
+          {
+                "id": "quote-029",
+                "quote": "มโนปุพฺพงฺคมา ธมฺมา มโนเสฏฺฐา มโนมยา ธรรมทั้งหลายมีใจเป็นหัวหน้า มีใจเป็นใหญ่ สำเร็จได้ด้วยใจ",
+                "explanation": "ใจคือตัวกำหนดว่าวันนี้จะไปทางไหน ถ้าเริ่มต้นด้วยจิตที่ตั้งมั่นและมีสติ การทำงานทุกอย่างจะตามมาด้วยคุณภาพ ลองสังเกตตัวเองสัก ๕ วินาทีก่อนเริ่มงานเช้า ใจเราอยู่ตรงไหน จดจ่อกับอะไร",
+                "source": "ขุ.ธ. ๒๕/๑ พระไตรปิฎก",
+                "category": "จิต",
+                "createdAt": "2026-07-16T08:17:00+07:00"
+          },
+          {
+                "id": "quote-030",
+                "quote": "ความไม่ประมาทเป็นทางแห่งความไม่ตาย ความประมาทเป็นทางแห่งความตาย ผู้ไม่ประมาทย่อมไม่ตาย ผู้ประมาทแล้วย่อมเป็นเหมือนคนตายแล้ว",
+                "explanation": "การรอจังหวะสมบูรณ์แบบเป็นภาพลวงตา สิ่งที่แยกคนที่สำเร็จออกจากคนที่ติดอยู่คือการเริ่มลงมือวันนี้ ณ จุดที่ยืนอยู่ ไม่ใช่รอให้ทุกอย่างพร้อมก่อน พร้อมไม่เคยมีจริง มีแค่เริ่มกับไม่เริ่ม",
+                "source": "ขุททกนิกาย ธรรมบท ข้อ ๒๑",
+                "category": "อัปปมาท",
+                "createdAt": "2026-07-16T12:19:00+07:00"
+          },
+          {
+                "id": "quote-031",
+                "quote": "อย่าดูหมิ่นบุญว่าเล็กน้อย สิ่งเล็กน้อยจะไม่มาถึงเราหรอก แม้หม้อน้ำยังเต็มได้ด้วยน้ำที่หยดทีละหยาด ผู้มีปัญญาย่อมเต็มไปด้วยบุญ แม้สะสมทีละน้อย",
+                "explanation": "การกระทำเล็กๆ ที่ทำวันนี้ ลุกมา ๕ นาทีก่อนเดิม อ่าน book summary สั้นๆ เขียนสิ่งที่รู้สึกขอบคุณ หรือหายใจลึกๆ สิบรอบ ล้วนเป็นน้ำทีละหยาดที่จะเติมเต็มหม้อแห่งชีวิต ปัญหาของคนส่วนใหญ่ไม่ใช่การขาดความสามารถ แต่คือการรอให้พร้อมก่อนค่อยเริ่ม",
+                "source": "พระธรรมบท ขุททกนิกาย ขุ.ธ. ๒๕/๑๒๒",
+                "category": "ปัญญา",
+                "createdAt": "2026-07-17T13:42:00+07:00"
+          }
+    ];
+
+    // ═════ State ═════
+    const appState = {
+      data: [],
+      filter: '',
+      category: '',
+      sortBy: 'newest',
+      tab: 'all',
+      favorites: new Set(),
+      theme: 'light',
+      currentQuoteId: null,
+      lastFocusedElement: null,
+      isLoading: false,
+      hasError: false,
+      errorMessage: ''
+    };
+
+    // ═════ DOM Elements ═════
+    const ui = {
+      loadingState: document.getElementById('loading-state'),
+      errorState: document.getElementById('error-state'),
+      errorMessage: document.getElementById('error-message'),
+      retryBtn: document.getElementById('retry-btn'),
+      appContent: document.getElementById('app-content'),
+      skeletonFeatured: document.getElementById('skeleton-featured'),
+      skeletonGrid: document.getElementById('skeleton-grid'),
+      totalCount: document.getElementById('total-count'),
+      lastUpdated: document.getElementById('last-updated'),
+      themeToggle: document.getElementById('theme-toggle'),
+      scrollTop: document.getElementById('scroll-top'),
+      featured: {
+        card: document.getElementById('featured-card'),
+        content: document.getElementById('featured-content'),
+        quote: document.getElementById('featured-quote'),
+        category: document.getElementById('featured-category'),
+        source: document.getElementById('featured-source'),
+        randomBtn: document.getElementById('random-quote-btn'),
+        readBtn: document.getElementById('featured-read-btn'),
+      },
+      search: document.getElementById('search-input'),
+      category: document.getElementById('category-select'),
+      sort: document.getElementById('sort-select'),
+      clearFilters: document.getElementById('clear-filters-btn'),
+      resultCount: document.getElementById('result-count'),
+      tabAll: document.getElementById('tab-all'),
+      tabFavorites: document.getElementById('tab-favorites'),
+      favCount: document.getElementById('fav-count'),
+      grid: document.getElementById('quote-grid'),
+      empty: document.getElementById('empty-state'),
+      emptyTitle: document.getElementById('empty-title'),
+      emptyDesc: document.getElementById('empty-desc'),
+      emptyClear: document.getElementById('empty-clear-btn'),
+      modal: {
+        overlay: document.getElementById('modal-overlay'),
+        quote: document.getElementById('modal-quote'),
+        explanation: document.getElementById('modal-explanation'),
+        category: document.getElementById('modal-category'),
+        source: document.getElementById('modal-source'),
+        date: document.getElementById('modal-date'),
+        close: document.getElementById('modal-close'),
+        closeBtn: document.getElementById('modal-close-btn'),
+        copy: document.getElementById('modal-copy-btn'),
+        fav: document.getElementById('modal-fav-btn'),
+        favText: document.getElementById('modal-fav-text'),
+        share: document.getElementById('modal-share-btn'),
+      },
+      toast: document.getElementById('toast'),
+      toastMessage: document.getElementById('toast-message'),
+    };
+
+    // ═════ Data Loading ═════
+
+    /**
+     * โหลดข้อมูลจาก Cron Job Response
+     * - ใช้ Endpoint จริงเมื่อมีการตั้งค่า
+     * - ใช้ข้อมูลตัวอย่างเป็น Fallback เมื่อยังไม่ได้ตั้งค่า
+     * - ตรวจสอบว่าข้อมูลที่ได้เป็น Array
+     * - กรองข้อมูลทุกรายการ ลบ id ที่ซำ้าหรือไม่มี
+     */
+    async function loadCronjobResponses() {
+      const isEndpointConfigured =
+        typeof CRONJOB_API_ENDPOINT === 'string' &&
+        CRONJOB_API_ENDPOINT.trim() !== '' &&
+        CRONJOB_API_ENDPOINT !== 'YOUR_CRONJOB_API_ENDPOINT';
+
+      if (isEndpointConfigured) {
+        try {
+          const response = await fetch(CRONJOB_API_ENDPOINT, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (!response.ok) {
+            throw new Error(`ไม่สามารถโหลดข้อมูล (สถานะ ${response.status})`);
+          }
+
+          const rawJson = await response.json();
+
+          // รอบรูป quotes.json ที่มี { quotes: [...] } หรือ [...]
+          const rawData = Array.isArray(rawJson)
+            ? rawJson
+            : Array.isArray(rawJson?.quotes)
+              ? rawJson.quotes
+              : null;
+
+          if (!Array.isArray(rawData)) {
+            throw new Error('ข้อมูลที่ได้รับไม่ใช่รูปแบบ Array หรือ { quotes: [...] }');
+          }
+
+          return sanitizeQuotes(rawData);
+        } catch (error) {
+          console.error('ไม่สามารถโหลดข้อมูลจาก API ได้:', error);
+          throw error;
+        }
+      }
+
+      // Fallback: ข้อมูลตัวอย่าง
+      return sanitizeQuotes(cronjobResponses);
+    }
+
+    /**
+     * ทำความสะอาดข้อมูลที่ได้รับ ให้ปลอดภัย และมี id ที่ไม่ซำ้าหรือขาดหลาย
+     */
+    function sanitizeQuotes(rawData) {
+      if (!Array.isArray(rawData)) return [];
+
+      const seenIds = new Set();
+      const validItems = [];
+
+      rawData.forEach((item, index) => {
+        if (!item || typeof item !== 'object') return;
+
+        let id = item.id;
+        if (!id || typeof id !== 'string') {
+          id = `quote-${index + 1}`;
+        }
+
+        if (seenIds.has(id)) {
+          id = `${id}-${index + 1}`;
+        }
+        seenIds.add(id);
+
+        const sanitized = {
+          id: id,
+          quote: typeof item.quote === 'string' ? item.quote : 'ไม่มีข้อคำคม',
+          explanation: typeof item.explanation === 'string' ? item.explanation : '',
+          source: typeof item.source === 'string' ? item.source : 'ไม่ระบุที่มา',
+          category: typeof item.category === 'string' ? item.category : 'ทั่วไป',
+          createdAt: typeof item.createdAt === 'string' ? item.createdAt : ''
+        };
+
+        validItems.push(sanitized);
+      });
+
+      return validItems;
+    }
+
+    // ═════ Helpers ═════
+    function getField(value, fallback = 'ไม่ระบุ') {
+      return value != null && String(value).trim() !== '' ? String(value).trim() : fallback;
+    }
+
+    function formatThaiDate(isoString) {
+      if (!isoString) return 'ไม่ระบุวันที่';
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) return 'วันที่ไม่ถูกต้อง';
+
+      return new Intl.DateTimeFormat('th-TH', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    }
+
+    function sortData(items, sortBy) {
+      const sorted = [...items];
+      switch (sortBy) {
+        case 'newest':
+          return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        case 'oldest':
+          return sorted.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+        case 'alphabetical':
+          return sorted.sort((a, b) => getField(a.quote).localeCompare(getField(b.quote), 'th'));
+        default:
+          return sorted;
+      }
+    }
+
+    function getCategories(items) {
+      const cats = new Set(items.map(item => getField(item.category, 'ทั่วไป')));
+      return Array.from(cats).sort((a, b) => a.localeCompare(b, 'th'));
+    }
+
+    // ═════ Persistence ═════
+    function loadFavorites() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.favorites);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            appState.favorites = new Set(parsed.filter(id => typeof id === 'string'));
+          }
+        }
+      } catch (e) {
+        console.warn('ไม่สามารถโหลดรายการโปรดได้:', e);
+        appState.favorites = new Set();
+      }
+    }
+
+    function saveFavorites() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.favorites, JSON.stringify(Array.from(appState.favorites)));
+      } catch (e) {
+        console.warn('ไม่สามารถบันทึกรายการโปรดได้:', e);
+      }
+    }
+
+    function loadTheme() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.theme);
+        if (saved === 'dark' || saved === 'light') {
+          appState.theme = saved;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          appState.theme = 'dark';
+        }
+      } catch (e) {
+        console.warn('ไม่สามารถโหลดธีมได้:', e);
+      }
+      document.documentElement.setAttribute('data-theme', appState.theme);
+    }
+
+    function saveTheme() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.theme, appState.theme);
+      } catch (e) {
+        console.warn('ไม่สามารถบันทึกธีมได้:', e);
+      }
+    }
+
+    function toggleTheme() {
+      appState.theme = appState.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', appState.theme);
+      saveTheme();
+    }
+
+    // ═════ Filtering & Rendering ═════
+    function getFilteredItems() {
+      let items = appState.data;
+
+      if (appState.tab === 'favorites') {
+        items = items.filter(item => appState.favorites.has(item.id));
+      }
+
+      if (appState.category) {
+        items = items.filter(item => getField(item.category, 'ทั่วไป') === appState.category);
+      }
+
+      if (appState.filter.trim()) {
+        const term = appState.filter.trim().toLowerCase();
+        items = items.filter(item =>
+          getField(item.quote).toLowerCase().includes(term) ||
+          getField(item.explanation).toLowerCase().includes(term) ||
+          getField(item.source).toLowerCase().includes(term)
+        );
+      }
+
+      return sortData(items, appState.sortBy);
+    }
+
+    function renderCategories() {
+      const categories = getCategories(appState.data);
+      const current = ui.category.value;
+      ui.category.innerHTML = '<option value="">ทั้งหมด</option>';
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        ui.category.appendChild(option);
+      });
+      if (categories.includes(current)) {
+        ui.category.value = current;
+      }
+    }
+
+    function renderFeatured(quote) {
+      if (!quote) {
+        ui.featured.quote.textContent = 'ยังไม่มีข้อธรรมในขณะนี้';
+        ui.featured.category.textContent = '-';
+        ui.featured.source.textContent = '-';
+        ui.featured.readBtn.disabled = true;
+        ui.featured.readBtn.onclick = null;
+        return;
+      }
+
+      ui.featured.readBtn.disabled = false;
+      ui.featured.quote.textContent = getField(quote.quote);
+      ui.featured.category.textContent = getField(quote.category, 'ทั่วไป');
+      ui.featured.source.textContent = getField(quote.source);
+      ui.featured.readBtn.onclick = () => openModal(quote.id);
+    }
+
+    function createCardElement(item) {
+      const isFav = appState.favorites.has(item.id);
+      const card = document.createElement('article');
+      card.className = 'quote-card';
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('data-id', item.id);
+      card.setAttribute('aria-label', getField(item.quote).slice(0, 80));
+
+      const quote = document.createElement('blockquote');
+      quote.className = 'quote-card__quote';
+      quote.textContent = getField(item.quote);
+      card.appendChild(quote);
+
+      const footer = document.createElement('div');
+      footer.className = 'quote-card__footer';
+
+      const meta = document.createElement('div');
+      meta.className = 'quote-card__meta';
+
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = getField(item.category, 'ทั่วไป');
+      meta.appendChild(badge);
+
+      const source = document.createElement('span');
+      source.className = 'quote-card__source';
+      source.title = getField(item.source);
+      source.textContent = getField(item.source);
+      meta.appendChild(source);
+
+      const date = document.createElement('time');
+      date.className = 'quote-card__date';
+      date.setAttribute('datetime', item.createdAt || '');
+      date.textContent = formatThaiDate(item.createdAt);
+      meta.appendChild(date);
+
+      footer.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'quote-card__actions';
+
+      const favBtn = document.createElement('button');
+      favBtn.className = `icon-btn btn-favorite ${isFav ? 'is-active' : ''}`;
+      favBtn.type = 'button';
+      favBtn.setAttribute('data-id', item.id);
+      favBtn.setAttribute('aria-label', isFav ? 'นำออกจากรายการโปรด' : 'บันทึกรายการโปรด');
+      favBtn.title = isFav ? 'นำออกจากรายการโปรด' : 'บันทึกรายการโปรด';
+      favBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      `;
+      favBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFavorite(item.id);
+      });
+      actions.appendChild(favBtn);
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'icon-btn btn-copy';
+      copyBtn.type = 'button';
+      copyBtn.setAttribute('aria-label', 'คัดลอกข้อความ');
+      copyBtn.title = 'คัดลอกข้อความ';
+      copyBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      `;
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyQuote(item);
+      });
+      actions.appendChild(copyBtn);
+
+      footer.appendChild(actions);
+      card.appendChild(footer);
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.icon-btn')) return;
+        openModal(item.id);
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(item.id);
+        }
+      });
+
+      return card;
+    }
+
+    function renderGrid() {
+      const items = getFilteredItems();
+      ui.totalCount.textContent = appState.data.length.toLocaleString('th-TH');
+      ui.resultCount.textContent = `พบ ${items.length.toLocaleString('th-TH')} รายการ`;
+      ui.favCount.textContent = `${appState.favorites.size.toLocaleString('th-TH')} รายการ`;
+
+      ui.grid.innerHTML = '';
+
+      if (items.length === 0) {
+        ui.grid.hidden = true;
+        ui.empty.hidden = false;
+
+        if (appState.data.length === 0) {
+          ui.emptyTitle.textContent = 'ยังไม่มีข้อธรรมในขณะนี้';
+          ui.emptyDesc.textContent = 'ข้อมูลจะปรากฏเมื่อ Cron Job ส่งคำคมธรรมะเข้ามา';
+          ui.emptyClear.hidden = true;
+        } else {
+          ui.emptyTitle.textContent = 'ไม่พบข้อธรรมที่ตรงกับการค้นหา';
+          ui.emptyDesc.textContent = 'ลองปรับคำค้นหาหรือตัวกรองใหม่';
+          ui.emptyClear.hidden = false;
+        }
+        return;
+      }
+
+      ui.grid.hidden = false;
+      ui.empty.hidden = true;
+
+      const fragment = document.createDocumentFragment();
+      items.forEach(item => {
+        fragment.appendChild(createCardElement(item));
+      });
+      ui.grid.appendChild(fragment);
+    }
+
+    function renderAll() {
+      renderCategories();
+      renderGrid();
+    }
+
+    // ═════ Loading UI ═════
+    function showLoading() {
+      appState.isLoading = true;
+      ui.loadingState.hidden = false;
+      ui.errorState.hidden = true;
+      ui.appContent.hidden = true;
+      ui.skeletonFeatured.hidden = true;
+      ui.skeletonGrid.hidden = true;
+    }
+
+    function showSkeleton() {
+      ui.loadingState.hidden = true;
+      ui.errorState.hidden = true;
+      ui.appContent.hidden = false;
+      ui.skeletonFeatured.hidden = false;
+      ui.featured.card.hidden = true;
+      ui.skeletonGrid.hidden = false;
+      ui.grid.hidden = true;
+      ui.empty.hidden = true;
+    }
+
+    function showApp() {
+      appState.isLoading = false;
+      appState.hasError = false;
+      ui.loadingState.hidden = true;
+      ui.errorState.hidden = true;
+      ui.appContent.hidden = false;
+      ui.skeletonFeatured.hidden = true;
+      ui.featured.card.hidden = false;
+      ui.skeletonGrid.hidden = true;
+      ui.grid.hidden = false;
+    }
+
+    function showError(message) {
+      appState.isLoading = false;
+      appState.hasError = true;
+      appState.errorMessage = message;
+      ui.loadingState.hidden = true;
+      ui.errorState.hidden = false;
+      ui.appContent.hidden = true;
+      ui.errorMessage.textContent = message;
+    }
+
+    // ═════ Featured Actions ═════
+    function setRandomFeatured() {
+      if (appState.data.length === 0) return;
+      const random = appState.data[Math.floor(Math.random() * appState.data.length)];
+      appState.currentQuoteId = random.id;
+
+      const content = ui.featured.content;
+      content.classList.add('is-fading');
+
+      const update = () => {
+        renderFeatured(random);
+        content.classList.remove('is-fading');
+      };
+
+      const onTransitionEnd = () => {
+        update();
+        content.removeEventListener('transitionend', onTransitionEnd);
+      };
+      content.addEventListener('transitionend', onTransitionEnd);
+      setTimeout(update, 350);
+    }
+
+    // ═════ Favorites ═════
+    function toggleFavorite(id) {
+      if (appState.favorites.has(id)) {
+        appState.favorites.delete(id);
+        showToast('นำออกจากรายการโปรดแล้ว');
+      } else {
+        appState.favorites.add(id);
+        showToast('บันทึกรายการโปรดแล้ว');
+      }
+      saveFavorites();
+      renderGrid();
+      if (appState.currentQuoteId === id) {
+        updateModalFavoriteState();
+      }
+    }
+
+    // ═════ Copy & Share ═════
+    function buildQuoteText(item) {
+      return `${getField(item.quote)}\n— ${getField(item.source)}`;
+    }
+
+    async function copyQuote(item) {
+      const text = buildQuoteText(item);
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('คัดลอกข้อความแล้ว');
+      } catch (err) {
+        console.warn('Clipboard API ล้มเหลว:', err);
+        showToast('ไม่สามารถคัดลอกได้');
+      }
+    }
+
+    async function shareQuote(item) {
+      const text = buildQuoteText(item);
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'ธรรมะประจำวัน',
+            text: text
+          });
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.warn('Web Share API ล้มเหลว:', err);
+          }
+        }
+      }
+      await copyQuote(item);
+    }
+
+    // ═════ Modal ═════
+    function openModal(id) {
+      const item = appState.data.find(q => q.id === id);
+      if (!item) return;
+
+      appState.currentQuoteId = id;
+      appState.lastFocusedElement = document.activeElement;
+
+      ui.modal.quote.textContent = getField(item.quote);
+      ui.modal.explanation.textContent = getField(item.explanation, 'ไม่มีคำอธิบายเพิ่มเติม');
+      ui.modal.category.textContent = getField(item.category, 'ทั่วไป');
+      ui.modal.source.textContent = getField(item.source);
+      ui.modal.date.textContent = formatThaiDate(item.createdAt);
+      ui.modal.date.setAttribute('datetime', item.createdAt || '');
+
+      updateModalFavoriteState();
+
+      ui.modal.overlay.hidden = false;
+      void ui.modal.overlay.offsetWidth;
+      ui.modal.overlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+
+      ui.modal.close.focus();
+    }
+
+    function updateModalFavoriteState() {
+      const isFav = appState.favorites.has(appState.currentQuoteId);
+      ui.modal.favText.textContent = isFav ? 'นำออกจากรายการโปรด' : 'บันทึกรายการโปรด';
+      ui.modal.fav.classList.toggle('is-active', isFav);
+      const heart = ui.modal.fav.querySelector('svg');
+      if (heart) heart.setAttribute('fill', isFav ? 'currentColor' : 'none');
+    }
+
+    function closeModal() {
+      ui.modal.overlay.classList.remove('is-open');
+      document.body.style.overflow = '';
+
+      const hide = () => {
+        ui.modal.overlay.hidden = true;
+        appState.currentQuoteId = null;
+        if (appState.lastFocusedElement) {
+          appState.lastFocusedElement.focus();
+          appState.lastFocusedElement = null;
+        }
+      };
+
+      const onTransitionEnd = () => {
+        hide();
+        ui.modal.overlay.removeEventListener('transitionend', onTransitionEnd);
+      };
+      ui.modal.overlay.addEventListener('transitionend', onTransitionEnd);
+      setTimeout(hide, 300);
+    }
+
+    function trapFocus(e) {
+      if (e.key !== 'Tab') return;
+      const focusable = ui.modal.overlay.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    // ═════ Toast ═════
+    let toastTimeout;
+    function showToast(message) {
+      ui.toastMessage.textContent = message;
+      ui.toast.classList.add('is-visible');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        ui.toast.classList.remove('is-visible');
+      }, 2200);
+    }
+
+    // ═════ Scroll to Top ═════
+    function updateScrollTopButton() {
+      if (window.scrollY > 300) {
+        ui.scrollTop.classList.add('is-visible');
+      } else {
+        ui.scrollTop.classList.remove('is-visible');
+      }
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ═════ Event Listeners ═════
+    function bindEvents() {
+      ui.themeToggle.addEventListener('click', toggleTheme);
+      ui.featured.randomBtn.addEventListener('click', setRandomFeatured);
+
+      ui.search.addEventListener('input', (e) => {
+        appState.filter = e.target.value;
+        renderGrid();
+      });
+
+      ui.category.addEventListener('change', (e) => {
+        appState.category = e.target.value;
+        renderGrid();
+      });
+
+      ui.sort.addEventListener('change', (e) => {
+        appState.sortBy = e.target.value;
+        renderGrid();
+      });
+
+      ui.clearFilters.addEventListener('click', clearFilters);
+      ui.emptyClear.addEventListener('click', clearFilters);
+      ui.retryBtn.addEventListener('click', initializeApp);
+
+      ui.tabAll.addEventListener('click', () => setTab('all'));
+      ui.tabFavorites.addEventListener('click', () => setTab('favorites'));
+
+      ui.modal.close.addEventListener('click', closeModal);
+      ui.modal.closeBtn.addEventListener('click', closeModal);
+      ui.modal.overlay.addEventListener('click', (e) => {
+        if (e.target === ui.modal.overlay) closeModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !ui.modal.overlay.hidden) {
+          closeModal();
+        }
+      });
+      ui.modal.overlay.addEventListener('keydown', trapFocus);
+
+      ui.modal.copy.addEventListener('click', () => {
+        const item = appState.data.find(q => q.id === appState.currentQuoteId);
+        if (item) copyQuote(item);
+      });
+
+      ui.modal.fav.addEventListener('click', () => {
+        if (appState.currentQuoteId) toggleFavorite(appState.currentQuoteId);
+      });
+
+      ui.modal.share.addEventListener('click', () => {
+        const item = appState.data.find(q => q.id === appState.currentQuoteId);
+        if (item) shareQuote(item);
+      });
+
+      ui.scrollTop.addEventListener('click', scrollToTop);
+      window.addEventListener('scroll', updateScrollTopButton, { passive: true });
+    }
+
+    function setTab(tab) {
+      appState.tab = tab;
+      ui.tabAll.classList.toggle('is-active', tab === 'all');
+      ui.tabAll.setAttribute('aria-selected', tab === 'all');
+      ui.tabFavorites.classList.toggle('is-active', tab === 'favorites');
+      ui.tabFavorites.setAttribute('aria-selected', tab === 'favorites');
+      renderGrid();
+    }
+
+    function clearFilters() {
+      appState.filter = '';
+      appState.category = '';
+      appState.sortBy = 'newest';
+      ui.search.value = '';
+      ui.category.value = '';
+      ui.sort.value = 'newest';
+      renderGrid();
+    }
+
+    // ═════ Initialization ═════
+    async function initializeApp() {
+      try {
+        showLoading();
+        loadTheme();
+        loadFavorites();
+        bindEvents();
+
+        // สังเกตุ Skeleton เพื่อประสบงานที่นุ่มนวล
+        setTimeout(() => {
+          if (appState.isLoading) showSkeleton();
+        }, 300);
+
+        const responses = await loadCronjobResponses();
+        appState.data = responses;
+
+        showApp();
+
+        if (appState.data.length > 0) {
+          const latest = new Date(Math.max(...appState.data.map(q => new Date(q.createdAt || 0).getTime())));
+          ui.lastUpdated.textContent = new Intl.DateTimeFormat('th-TH', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }).format(latest);
+        } else {
+          ui.lastUpdated.textContent = '-';
+        }
+
+        const sorted = sortData(appState.data, 'newest');
+        if (sorted.length > 0) {
+          appState.currentQuoteId = sorted[0].id;
+          renderFeatured(sorted[0]);
+        } else {
+          renderFeatured(null);
+        }
+
+        renderAll();
+      } catch (error) {
+        console.error('การเริ่มต้นแอปล้มเหลว:', error);
+        showError(error.message || 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่');
+      }
+    }
+
+    initializeApp();
+  </script>
+</body>
+</html>

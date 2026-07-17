@@ -1582,7 +1582,7 @@
 
           const rawJson = await response.json();
 
-          // รอบรูป quotes.json ที่มี { quotes: [...] } หรือ [...]
+          // รองรับ quotes.json ที่มี { quotes: [...] } หรือ [...]
           const rawData = Array.isArray(rawJson)
             ? rawJson
             : Array.isArray(rawJson?.quotes)
@@ -1596,6 +1596,12 @@
           return sanitizeQuotes(rawData);
         } catch (error) {
           console.error('ไม่สามารถโหลดข้อมูลจาก API ได้:', error);
+          // Fallback ไปใช้ข้อมูลในตัว (embedded) แทนการ throw error
+          // กรณี: เปิดจาก file:// หรือ offline
+          if (Array.isArray(cronjobResponses) && cronjobResponses.length > 0) {
+            console.warn('ใช้ข้อมูล embedded แทน (offline mode)');
+            return sanitizeQuotes(cronjobResponses);
+          }
           throw error;
         }
       }

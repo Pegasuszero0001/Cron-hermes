@@ -1,0 +1,46 @@
+name: Ingest Dhamma Quotes
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'cron-output/**'
+      - 'scripts/quotes-ingest.py'
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run ingest script
+        env:
+          QUOTES_ENABLE_GIT_PUSH: "false"
+          CRON_OUTPUT_DIR: "${{ github.workspace }}/cron-output"
+        run: python scripts/quotes-ingest.py
+
+      - name: Commit and push quotes.json
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add quotes.json
+          if git diff --cached --quiet; then
+            echo "No changes - quotes.json is up to date"
+          else
+            git commit -m "chore: auto-update quotes.json from cron outputs"
+            git push
+          fi

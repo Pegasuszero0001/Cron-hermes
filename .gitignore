@@ -1,0 +1,6 @@
+*.log
+__pycache__/
+*.pyc
+quotes-data*.json
+inject.py
+server.log

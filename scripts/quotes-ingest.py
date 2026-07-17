@@ -10,13 +10,23 @@ Designed to run silently when nothing new; prints summary when new quotes added.
 import json
 import os
 import re
+import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# ─── Configuration ───
-CRON_OUTPUT_DIR = Path.home() / "AppData/Local/hermes/cron/output/8fd3ee00decc"
+# ═══ Configuration ═══
+# CRON_OUTPUT_DIR: read from env (GitHub Actions) or default to local Hermes path
+CRON_OUTPUT_DIR = Path(os.environ.get("CRON_OUTPUT_DIR", str(Path.home() / "AppData/Local/hermes/cron/output/8fd3ee00decc")))
 QUOTES_JSON = Path(__file__).resolve().parent.parent / "quotes.json"
+REPO_DIR = QUOTES_JSON.parent
+
+# Git remote URL is configured via the cron job environment or existing git remote
+# If none is set, push will be skipped.
+ENABLE_GIT_PUSH = os.environ.get("QUOTES_ENABLE_GIT_PUSH", "true").lower() in ("1", "true", "yes")
+
+# GitHub Actions workflow path
+WORKFLOW_DIR = REPO_DIR / ".github" / "workflows"
 
 # Map keywords to categories
 CATEGORY_MAP = [
@@ -230,11 +240,83 @@ def main():
         encoding="utf-8",
     )
 
+    pushed = False
+    if ENABLE_GIT_PUSH:
+        pushed = push_to_github(len(added))
+
     # Print summary for Telegram delivery
-    new_ids = ", ".join(q["id"] for q in quotes if q["id"] in [f"quote-{len(quotes)-len(added)+i+1:03d}" for i in range(len(added))])
-    print(f"พบ quote ใหม่ {len(added)} รายการ รวม {len(quotes)} รายกาใน quotes.json")
+    if pushed:
+        print(f"พบ quote ใหม่ {len(added)} รายการ รวม {len(quotes)} รายการ และ push ขึ้น GitHub แล้ว")
+    else:
+        print(f"พบ quote ใหม่ {len(added)} รายการ รวม {len(quotes)} รายกาใน quotes.json (Git push ถูกข้าม/ปิดใช้)")
+
+
+def push_to_github(added_count: int) -> bool:
+    """Commit and push quotes.json to the configured Git remote."""
+    try:
+        # Ensure git repo exists
+        if not (REPO_DIR / ".git").is_dir():
+            print("ไม่พบ git repository ใน {REPO_DIR}", file=sys.stderr)
+            return False
+
+        # Check remote
+        result = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=REPO_DIR,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            print("ไม่มี git remote origin", file=sys.stderr)
+            return False
+
+        # Stage quotes.json
+        subprocess.run(
+            ["git", "add", "quotes.json"],
+            cwd=REPO_DIR,
+            check=True,
+            capture_output=True,
+        )
+
+        # Check if there's anything to commit
+        status = subprocess.run(
+            ["git", "status", "--porcelain", "quotes.json"],
+            cwd=REPO_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        if not status.stdout.strip():
+            # Nothing changed
+            return True
+
+        # Commit
+        timestamp = datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m-%d %H:%M")
+        subprocess.run(
+            ["git", "commit", "-m", f"chore: update quotes.json (+{added_count}) at {timestamp}"],
+            cwd=REPO_DIR,
+            check=True,
+            capture_output=True,
+        )
+
+        # Push
+        subprocess.run(
+            ["git", "push", "origin", "main"],
+            cwd=REPO_DIR,
+            check=True,
+            capture_output=True,
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Git push failed: {e}", file=sys.stderr)
+        if e.stderr:
+            print(e.stderr.decode("utf-8", errors="ignore"), file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"Unexpected error during git push: {e}", file=sys.stderr)
+        return False
 
 
 if __name__ == "__main__":
-    from datetime import timedelta  # import here to keep top clean
     main()

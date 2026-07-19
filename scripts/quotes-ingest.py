@@ -72,28 +72,121 @@ def parse_created_at(filename: str) -> str:
 
 
 def extract_blockquote(response_text: str) -> tuple[str, str]:
-    """Extract first blockquote and source line."""
+    """Extract first blockquote and source line.
+
+    Source lookup order:
+    1. Last blockquote line starting with — or -- or –
+    2. Embedded '—' in last blockquote line (inline source)
+    3. Text before blockquote mentioning 'พุทธ' / 'ตรัส' / 'สูตร'
+    4. Fallback: last body line that looks like a citation
+
+    Returns (quote_text, source_reference).
+    """
     lines = response_text.splitlines()
     quote_lines = []
-    source = ""
+    pre_lines = []
     in_quote = False
 
-    for i, line in enumerate(lines):
+    for line in lines:
         if line.strip().startswith(">"):
             in_quote = True
             quote_lines.append(re.sub(r"^>\s?", "", line).strip())
-        elif in_quote:
-            # Source often follows blockquote immediately as '— source'
-            clean = line.strip().lstrip("-—– ").strip()
-            if clean and not clean.startswith("**"):
-                source = clean.replace("**", "").strip()
-                break
-            elif quote_lines and not line.strip():
-                continue
-            elif quote_lines:
-                break
+        elif not in_quote:
+            pre_lines.append(line.strip())
+        else:
+            break
 
-    quote = " ".join(ql.strip() for ql in quote_lines if ql.strip())
+    if not quote_lines:
+        return "", ""
+
+    # ── Step 1: Find source in blockquote (last line starting with —/--/–)
+    source_idx = -1
+    source = ""
+    for i in range(len(quote_lines) - 1, -1, -1):
+        stripped = quote_lines[i].strip()
+        if any(stripped.startswith(d) for d in ("\u2014", "--", "\u2013")):
+            source = re.sub(r"^[\u2014\u2013-]{1,2}\s*", "", stripped).strip()
+            source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
+            source_idx = i
+            break
+
+    body_lines = [l for j, l in enumerate(quote_lines) if j != source_idx]
+
+    # ── Step 1b: First line of blockquote may be a lead-in with source
+    # (e.g. "พระพุทธเจ้าตรัสไว้ในอังคุตตรนิกายว่า")
+    if body_lines and not source:
+        first = body_lines[0]
+        pre_patterns = [
+            r"(?:พระพุทธเจ้า|พระผู้มีพระภาค)(?:ตรัส|กล่าว|สอน)(?:ไว้ใน|ใน)(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ในพระไตรปิฎก(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ในคัมภีร์(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+        ]
+        for pat in pre_patterns:
+            m = re.search(pat, first)
+            if m:
+                candidate = m.group(1).strip()
+                if len(candidate) > 2:
+                    source = candidate
+                    # Remove lead-in from body if it matches well
+                    if first in (m.group(0),) or len(m.group(0)) > 15:
+                        body_lines.pop(0)
+                    break
+
+    # ── Step 2: If no explicit dash source, look for embedded '—' in first or last line
+    if not source and body_lines:
+        # Check both first and last line for ' — ' separator
+        for idx in [len(body_lines) - 1, 0]:
+            if idx < 0 or idx >= len(body_lines):
+                continue
+            line = body_lines[idx]
+            sep_match = re.search(r"\s[\u2014\u2013-]{1,2}\s(.+)$", line)
+            if sep_match:
+                candidate = sep_match.group(1).strip()
+                # Check that part after separator is substantial
+                if len(candidate) > 10:
+                    source = candidate
+                    body_lines[idx] = line[:sep_match.start()].strip()
+                    source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
+                    break
+                # Or check that the part BEFORE looks like a lead-in
+                before_sep = line[:sep_match.start()].strip()
+                if any(kw in before_sep for kw in ("พุทธ", "ตรัส", "กล่าว", "สอน")) and len(candidate) > 5:
+                    source = candidate
+                    body_lines[idx] = before_sep
+                    source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
+                    break
+
+    # ── Step 3: Look for source mention in text BEFORE blockquote
+    if not source and pre_lines:
+        pre_text = " ".join(pre_lines)
+        # Look for patterns like "พุทธวจนะในXXX", "XXXสูตร", "พระพุทธเจ้าตรัสในXXX"
+        source_patterns = [
+            r"พุทธวจนะใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ใน(.+?)(?:สูตร|นิกาย|ปิฎก)(?:\s*ว่า|\s*[,\(\)]|\s*$|(?=\s))",
+            r"ตรัสไว้ใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ตรัสสอน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"พระพุทธเจ้าตรัสไว้ใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ในคัมภีร์(.+?)(?:\s*พระ|\s*ว่า|\s*[,\(\)]|\s*$)",
+            r"ที่ชื่อว่า(.+?)(?:สูตร|นิกาย|ปิฎก)",
+        ]
+        for pat in source_patterns:
+            m = re.search(pat, pre_text)
+            if m:
+                candidate = m.group(1).strip()
+                if len(candidate) > 2:
+                    source = candidate
+                    break
+
+    # ── Step 4: Fallback — last body line looks like a citation
+    if not source and body_lines:
+        last_line = body_lines[-1]
+        citation_keywords = ("พระ", "พุทธ", "ตรัส", "สูตร", "นิกาย", "ปิฎก", "เล่ม", "ข้อ", "น.")
+        if any(kw in last_line for kw in citation_keywords):
+            source = body_lines.pop()
+            source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
+
+    quote = " ".join(ql.strip() for ql in body_lines if ql.strip())
+    quote = re.sub(r"\*\*(.+?)\*\*", r"\1", quote).strip()
     return quote, source
 
 
@@ -116,8 +209,12 @@ def extract_explanation(response_text: str, quote: str) -> str:
                 paragraphs.append(" ".join(current_para))
                 current_para = []
             continue
-        # Skip source line, emoji-only lines, sign-off
-        if re.match(r"^[-—–]\s*", stripped):
+        # Skip lines that are just metadata/sign-off/separator
+        if re.match(r"^[-—–]{2,}\s*$", stripped):
+            continue
+        if re.match(r"^[-—–]\s*", stripped) and any(kw in stripped for kw in [
+            "ด้วยความปรารถนาดี", "มาเบลล์", "เลขา", "คุณนอร์ท", "🙏", "✨", "🌿", "🌟", "💪"
+        ]):
             continue
         if stripped.startswith("ด้วยความปรารถนาดี"):
             continue
@@ -125,16 +222,21 @@ def extract_explanation(response_text: str, quote: str) -> str:
             continue
         # Remove markdown bold but keep text
         cleaned = re.sub(r"\*\*(.+?)\*\*", r"\1", stripped)
-        # Remove emoji
-        cleaned = re.sub(r"[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF\u2600-\u26FF\u2700-\u27BF]", "", cleaned)
-        if cleaned.strip():
-            current_para.append(cleaned.strip())
+        # Remove emoji at start/end
+        cleaned = re.sub(
+            r"^[\U0001F300-\U0001F9FF\u2600-\u26FF\u2700-\u27BF\U0001F600-\U0001F64F]+"
+            r"|[\U0001F300-\U0001F9FF\u2600-\u26FF\u2700-\u27BF\U0001F600-\U0001F64F]+$",
+            "", cleaned
+        ).strip()
+        if cleaned:
+            current_para.append(cleaned)
 
     if current_para:
         paragraphs.append(" ".join(current_para))
 
-    # Filter out paragraphs that are too short or duplicate quote
-    valid = [p for p in paragraphs if len(p) > 30 and p != quote]
+    # Filter out paragraphs that are too short, duplicate quote, or look like sign-off
+    valid = [p for p in paragraphs if len(p) > 20 and p != quote
+             and not p.startswith("ด้วยความปรารถนาดี")]
     return valid[0] if valid else ""
 
 
@@ -182,10 +284,10 @@ def parse_markdown_file(md_path: Path) -> dict | None:
     }
 
 
-def load_existing_quotes() -> tuple[list, set]:
-    """Load existing quotes.json and return list + set of ids."""
+def load_existing_quotes() -> tuple[list, set, set]:
+    """Load existing quotes.json and return list + set of ids + set of quote texts."""
     if not QUOTES_JSON.exists():
-        return [], set()
+        return [], set(), set()
     try:
         data = json.loads(QUOTES_JSON.read_text(encoding="utf-8"))
         if isinstance(data, dict) and "quotes" in data:
@@ -195,9 +297,10 @@ def load_existing_quotes() -> tuple[list, set]:
         else:
             quotes = []
         ids = {q.get("id") for q in quotes if q.get("id")}
-        return quotes, ids
+        texts = {q.get("quote") for q in quotes if q.get("quote")}
+        return quotes, ids, texts
     except (json.JSONDecodeError, OSError):
-        return [], set()
+        return [], set(), set()
 
 
 def main():
@@ -205,7 +308,7 @@ def main():
         # Silent fail if source dir missing
         sys.exit(0)
 
-    quotes, existing_ids = load_existing_quotes()
+    quotes, existing_ids, existing_texts = load_existing_quotes()
     added = []
 
     md_files = sorted(CRON_OUTPUT_DIR.glob("*.md"))
@@ -213,11 +316,15 @@ def main():
         q = parse_markdown_file(md_path)
         if not q:
             continue
+        # Dedup by both filename-based ID and quote text content
         if q["id"] in existing_ids:
+            continue
+        if q["quote"] in existing_texts:
             continue
         quotes.append(q)
         added.append(q["id"])
         existing_ids.add(q["id"])
+        existing_texts.add(q["quote"])
 
     if not added:
         # Silent: cronjob delivers nothing

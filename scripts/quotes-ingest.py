@@ -102,12 +102,16 @@ def extract_blockquote(response_text: str) -> tuple[str, str]:
     # ── Step 1: Find source in blockquote (last line starting with —/--/–)
     source_idx = -1
     source = ""
+    citation_check_kw = ("พระ", "พุทธ", "ตรัส", "สูตร", "นิกาย", "ปิฎก", "เล่ม", "ข้อ", "น.", "Dhammapada", "AN", "SN", "MN", "องฺ", "สํ", "ขุ", "ที", "ม.", "อภิ")
     for i in range(len(quote_lines) - 1, -1, -1):
         stripped = quote_lines[i].strip()
         if any(stripped.startswith(d) for d in ("\u2014", "--", "\u2013")):
-            source = re.sub(r"^[\u2014\u2013-]{1,2}\s*", "", stripped).strip()
-            source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
-            source_idx = i
+            candidate = re.sub(r"^[\u2014\u2013-]{1,2}\s*", "", stripped).strip()
+            candidate = re.sub(r"\*\*(.+?)\*\*", r"\1", candidate)
+            # Only accept if it looks like a citation (short or has citation keywords)
+            if len(candidate) <= 30 or any(kw in candidate for kw in citation_check_kw):
+                source = candidate
+                source_idx = i
             break
 
     body_lines = [l for j, l in enumerate(quote_lines) if j != source_idx]
@@ -115,7 +119,7 @@ def extract_blockquote(response_text: str) -> tuple[str, str]:
     # ── Step 1b: First line of blockquote may be a lead-in with source
     # (e.g. "พระพุทธเจ้าตรัสไว้ในอังคุตตรนิกายว่า")
     if body_lines and not source:
-        first = body_lines[0]
+        first = re.sub(r"\*\*(.+?)\*\*", r"\1", body_lines[0])  # strip bold
         pre_patterns = [
             r"(?:พระพุทธเจ้า|พระผู้มีพระภาค)(?:ตรัส|กล่าว|สอน)(?:ไว้ใน|ใน)(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
             r"ในพระไตรปิฎก(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
@@ -132,47 +136,55 @@ def extract_blockquote(response_text: str) -> tuple[str, str]:
                         body_lines.pop(0)
                     break
 
-    # ── Step 2: If no explicit dash source, look for embedded '—' in first or last line
+    # ── Step 2: If no explicit dash source, look for embedded '—' in last line only
     if not source and body_lines:
-        # Check both first and last line for ' — ' separator
-        for idx in [len(body_lines) - 1, 0]:
-            if idx < 0 or idx >= len(body_lines):
-                continue
-            line = body_lines[idx]
-            sep_match = re.search(r"\s[\u2014\u2013-]{1,2}\s(.+)$", line)
-            if sep_match:
-                candidate = sep_match.group(1).strip()
-                # Check that part after separator is substantial
-                if len(candidate) > 10:
-                    source = candidate
-                    body_lines[idx] = line[:sep_match.start()].strip()
-                    source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
-                    break
-                # Or check that the part BEFORE looks like a lead-in
-                before_sep = line[:sep_match.start()].strip()
-                if any(kw in before_sep for kw in ("พุทธ", "ตรัส", "กล่าว", "สอน")) and len(candidate) > 5:
-                    source = candidate
-                    body_lines[idx] = before_sep
-                    source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
-                    break
+        idx = len(body_lines) - 1
+        line = body_lines[idx]
+        sep_match = re.search(r"\s[\u2014\u2013-]{1,2}\s(.+)$", line)
+        if sep_match:
+            candidate = sep_match.group(1).strip()
+            before_sep = line[:sep_match.start()].strip()
+            # Accept only if part after separator looks like a citation
+            citation_kw = ("พระ", "พุทธ", "ตรัส", "สูตร", "นิกาย", "ปิฎก", "เล่ม", "ข้อ", "น.", "Dhammapada")
+            is_citation = any(kw in candidate for kw in citation_kw)
+            # Or if the part BEFORE looks like a lead-in (has teaching verbs)
+            is_leadin = any(kw in before_sep for kw in ("พุทธ", "ตรัส", "กล่าว", "สอน"))
+            if is_citation or (is_leadin and len(candidate) > 5):
+                # Try to extract just the citation from parentheses if candidate is long
+                paren_match = re.search(r'\((.+?)\)\s*$', candidate)
+                if paren_match and len(candidate) > 30:
+                    candidate = paren_match.group(1).strip()
+                source = candidate
+                body_lines[idx] = before_sep
+                source = re.sub(r"\*\*(.+?)\*\*", r"\1", source)
 
     # ── Step 3: Look for source mention in text BEFORE blockquote
     if not source and pre_lines:
         pre_text = " ".join(pre_lines)
+        # Strip markdown bold for easier matching
+        pre_text_clean = re.sub(r"\*\*(.+?)\*\*", r"\1", pre_text)
+        pre_text_clean = re.sub(r"\s+", " ", pre_text_clean)  # normalize spaces
         # Look for patterns like "พุทธวจนะในXXX", "XXXสูตร", "พระพุทธเจ้าตรัสในXXX"
         source_patterns = [
             r"พุทธวจนะใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
-            r"ใน(.+?)(?:สูตร|นิกาย|ปิฎก)(?:\s*ว่า|\s*[,\(\)]|\s*$|(?=\s))",
+            r"ใน(.+(?:สูตร|นิกาย|ปิฎก))",
             r"ตรัสไว้ใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
             r"ตรัสสอน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
             r"พระพุทธเจ้าตรัสไว้ใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
             r"ในคัมภีร์(.+?)(?:\s*พระ|\s*ว่า|\s*[,\(\)]|\s*$)",
             r"ที่ชื่อว่า(.+?)(?:สูตร|นิกาย|ปิฎก)",
+            r"พระพุทธเจ้าทรงสอนไว้ใน(.+?)(?:\s*ว่า|\s*[,\(\)]|\s*$)",
         ]
         for pat in source_patterns:
-            m = re.search(pat, pre_text)
+            m = re.search(pat, pre_text_clean)
             if m:
                 candidate = m.group(1).strip()
+                # Clean up incomplete parentheticals
+                if candidate.count("(") > candidate.count(")"):
+                    last_open = candidate.rfind("(")
+                    if last_open >= 0:
+                        candidate = candidate[:last_open].strip()
+                candidate = candidate.rstrip("(")
                 if len(candidate) > 2:
                     source = candidate
                     break

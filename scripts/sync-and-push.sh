@@ -7,11 +7,32 @@
 set -euo pipefail
 
 REPO_DIR="C:/Users/lognx/Documents/lognxtr/dhamma-quotes"
-CRON_SRC="$HOME/AppData/Local/hermes/cron/output/8fd3ee00decc"
-CRON_DST="$REPO_DIR/cron-output"
+CRON_BASE="$HOME/AppData/Local/hermes/cron/output"
 SSH_KEY="$HOME/.ssh/cron_hermes"
 
 export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i $SSH_KEY"
+
+# Dynamically find the "Quote ธรรมะ" job's output dir by matching the cron job name
+# (in case the job_id changes — e.g., when re-creating with a new provider).
+QUOTE_JOB_ID=""
+for d in "$CRON_BASE"/*/; do
+  jid=$(basename "$d")
+  # Look up the job name from jobs.json
+  name=$(python -c "import json; d=json.load(open(r'C:\Users\lognx\AppData\Local\hermes\cron\jobs.json',encoding='utf-8')); [print(j['name']) for j in d.get('jobs',[]) if j.get('id')=='$jid']" 2>/dev/null)
+  if [ "$name" = "Quote ธรรมะ" ]; then
+    QUOTE_JOB_ID="$jid"
+    break
+  fi
+done
+
+if [ -z "$QUOTE_JOB_ID" ]; then
+  echo "Could not find Quote ธรรมะ job dir under $CRON_BASE" >&2
+  exit 0
+fi
+
+CRON_SRC="$CRON_BASE/$QUOTE_JOB_ID"
+CRON_DST="$REPO_DIR/cron-output"
+echo "Using quote job dir: $QUOTE_JOB_ID" >&2
 
 # Check source dir exists
 if [ ! -d "$CRON_SRC" ]; then

@@ -16,8 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ═══ Configuration ═══
-# CRON_OUTPUT_DIR: read from env (GitHub Actions) or default to local Hermes path
-CRON_OUTPUT_DIR = Path(os.environ.get("CRON_OUTPUT_DIR", str(Path.home() / "AppData/Local/hermes/cron/output/8fd3ee00decc")))
+# CRON_OUTPUT_DIR is resolved dynamically in main() from env or jobs.json lookup
 QUOTES_JSON = Path(__file__).resolve().parent.parent / "quotes.json"
 REPO_DIR = QUOTES_JSON.parent
 
@@ -315,8 +314,36 @@ def load_existing_quotes() -> tuple[list, set, set]:
         return [], set(), set()
 
 
+def _resolve_cron_output_dir() -> Path:
+    """Resolve the Quote ธรรมะ cron output directory.
+
+    Order of resolution:
+    1. CRON_OUTPUT_DIR env var (GitHub Actions sets this to $workspace/cron-output)
+    2. Look up 'Quote ธรรมะ' job in ~/AppData/Local/hermes/cron/jobs.json and
+       return ~/AppData/Local/hermes/cron/output/<job_id>/
+    3. Fallback to legacy default (8fd3ee00decc) for backward compatibility
+    """
+    env_dir = os.environ.get("CRON_OUTPUT_DIR")
+    if env_dir:
+        return Path(env_dir)
+
+    jobs_file = Path.home() / "AppData/Local/hermes/cron/jobs.json"
+    if jobs_file.exists():
+        try:
+            with jobs_file.open(encoding="utf-8") as f:
+                data = json.load(f)
+            for job in data.get("jobs", []):
+                if job.get("name") == "Quote ธรรมะ" and job.get("id"):
+                    return Path.home() / "AppData/Local/hermes/cron/output" / job["id"]
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    return Path.home() / "AppData/Local/hermes/cron/output/8fd3ee00decc"
+
+
 def main():
-    if not CRON_OUTPUT_DIR.exists():
+    cron_output_dir = _resolve_cron_output_dir()
+    if not cron_output_dir.exists():
         # Silent fail if source dir missing
         sys.exit(0)
 
@@ -325,7 +352,7 @@ def main():
 
     # Only top-level *.md (skip _archive/ and other underscore-prefixed subdirs)
     md_files = sorted(
-        p for p in CRON_OUTPUT_DIR.glob("*.md")
+        p for p in cron_output_dir.glob("*.md")
         if p.is_file()
     )
     for md_path in md_files:

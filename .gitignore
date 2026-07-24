@@ -4,3 +4,5 @@ __pycache__/
 quotes-data*.json
 inject.py
 server.log
+quotes.json.bak
+cron-output/_archive/

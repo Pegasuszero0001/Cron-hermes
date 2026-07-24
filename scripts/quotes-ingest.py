@@ -323,7 +323,11 @@ def main():
     quotes, existing_ids, existing_texts = load_existing_quotes()
     added = []
 
-    md_files = sorted(CRON_OUTPUT_DIR.glob("*.md"))
+    # Only top-level *.md (skip _archive/ and other underscore-prefixed subdirs)
+    md_files = sorted(
+        p for p in CRON_OUTPUT_DIR.glob("*.md")
+        if p.is_file()
+    )
     for md_path in md_files:
         q = parse_markdown_file(md_path)
         if not q:
